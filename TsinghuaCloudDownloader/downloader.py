@@ -8,7 +8,10 @@ from tqdm import tqdm
 
 def argparser() -> argparse.Namespace:
     """
-    Parse the arguments from command line
+    Parse the arguments
+
+    Returns:
+        The arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -20,7 +23,7 @@ def argparser() -> argparse.Namespace:
         "--type",
         type=str,
         default=None,
-        help="file type downloaded, in regex. e.g. if you want to install all the .png files, use -t \.\*\.png",
+        help=r"file type downloaded, in regex. e.g. if you want to install all the .png files, use -t \.\*\.png",
     )
     parser.add_argument("-r", action="store_true", help="whether recursive downloading")
     return parser.parse_args()
@@ -29,6 +32,12 @@ def argparser() -> argparse.Namespace:
 def get_uid(url: str) -> str:
     """
     Get the uid from the url
+
+    Args:
+        url: The url of the tsinghua cloud
+
+    Returns:
+        The uid of the url
     """
     match = re.search(r"/([a-zA-Z0-9]+)\/?$", url)
     if match:
@@ -40,8 +49,14 @@ def get_uid(url: str) -> str:
 
 def get_file_folder_list(url: str, path: str) -> Tuple[list, list]:
     """
-    Get the file list from the url/path
-    Return the list of file and folder: [file_list, folder_list]
+    Get the file list and folder list
+
+    Args:
+        url: The url of the tsinghua cloud
+        path: The path of the folder
+
+    Returns:
+        The file list and folder list
     """
     resp = requests.get(
         url=url,
@@ -59,7 +74,13 @@ def get_file_folder_list(url: str, path: str) -> Tuple[list, list]:
 
 def make_dir(dir_path: str) -> None:
     """
-    Make the directory recursively
+    Make the directory
+
+    Args:
+        dir_path: The path of the directory
+
+    Returns:
+        None
     """
     dir_list = dir_path.split("/")
     if dir_list[0] == "":
@@ -75,6 +96,15 @@ def make_dir(dir_path: str) -> None:
 def download(url: str, file_list: list, dir_path: str, type: str) -> None:
     """
     Download the files
+
+    Args:
+        url: The url of the tsinghua cloud
+        file_list: The list of the files
+        dir_path: The path of the directory
+        type: The type of the files
+
+    Returns:
+        None
     """
     if dir_path[-1] == "/":
         dir_path = dir_path[:-1]
