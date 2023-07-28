@@ -1,3 +1,5 @@
 .vscode/
 3.0-hw2/
 __pycache__/
+config.json
+.DS_Store
