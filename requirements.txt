@@ -2,3 +2,5 @@ beautifulsoup4
 requests
 lxml
 tqdm
+webdriver-manager
+selenium

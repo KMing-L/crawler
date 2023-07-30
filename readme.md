@@ -57,3 +57,7 @@ python TsinghuaCloudDownloader/downloader.py -r -u https://cloud.tsinghua.edu.cn
   "cookie": "xxxx"
 }
 ```
+
+### 知乎爬虫
+
+见 `Zhihu`，相关内容可直接查看文件并自行根据需要修改代码。
