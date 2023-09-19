@@ -4,6 +4,7 @@ import requests
 import argparse
 import os
 from tqdm import tqdm
+from threading import Thread
 
 
 def argparser() -> argparse.Namespace:
@@ -93,6 +94,24 @@ def make_dir(dir_path: str) -> None:
             os.makedirs(dir)
 
 
+def download_file(url, dir_path, file_path):
+    resp = requests.get(url, params={"p": file_path, "dl": 1}, stream=True)
+    download_path = dir_path + file_path
+    if not os.path.exists(os.path.dirname(download_path)):
+        make_dir(os.path.dirname(download_path))
+    with open(download_path, "wb") as f, tqdm(
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        total=int(resp.headers["Content-Length"]),
+        desc=download_path,
+    ) as pbar:
+        for chunk in resp.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                pbar.update(len(chunk))
+
+
 def download(url: str, file_list: list, dir_path: str, type: str) -> None:
     """
     Download the files
@@ -113,22 +132,13 @@ def download(url: str, file_list: list, dir_path: str, type: str) -> None:
         print("download type: ", type)
         file_list = [file for file in file_list if re.search(type, file)]
 
+    threads = []
     for file_path in file_list:
-        resp = requests.get(url, params={"p": file_path, "dl": 1}, stream=True)
-        download_path = dir_path + file_path
-        if not os.path.exists(os.path.dirname(download_path)):
-            make_dir(os.path.dirname(download_path))
-        with open(download_path, "wb") as f, tqdm(
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            total=int(resp.headers["Content-Length"]),
-            desc=download_path,
-        ) as pbar:
-            for chunk in resp.iter_content(chunk_size=1024):
-                if chunk:
-                    f.write(chunk)
-                    pbar.update(len(chunk))
+        t = Thread(target=download_file, args=(url, dir_path, file_path))
+        threads.append(t)
+        t.start()
+    for t in threads:
+        t.join()
 
 
 if __name__ == "__main__":
